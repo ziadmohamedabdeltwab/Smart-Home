@@ -18,7 +18,7 @@ async function fetchSensor(channelId, field, elementId, apiKey) {
 function loadRoomData() {
   fetchSensor(CHANNEL_ID_1, 1, "master-temp", API_KEY_1);
   fetchSensor(CHANNEL_ID_1, 2, "master-presence", API_KEY_1);
-  fetchSensor(CHANNEL_ID_2, 5, "master-light", API_KEY_2);
+  fetchSensor(CHANNEL_ID_2, 5, "master-light", API_KEY_1);
   fetchSensor(CHANNEL_ID_2, 6, "master-maint", API_KEY_2);
 
   fetchSensor(CHANNEL_ID_1, 3, "kids-temp", API_KEY_1);

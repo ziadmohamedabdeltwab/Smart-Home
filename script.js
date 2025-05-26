@@ -1,9 +1,11 @@
-const CHANNEL_1 = "PN4LQP0M8HOKCYVH";
-const CHANNEL_2 = "OW98YIINEITU8MO1";
+const CHANNEL_ID_1 = 2972346; // الرقم الصحيح للقناة
+const CHANNEL_ID_2 = 2972346; // نفس القناة لـ LDR
+const API_KEY_1 = "PN4LQP0M8HOKCYVH";
+const API_KEY_2 = "OW98YIINEITU8MO1";
 
 // ========== ROOM DATA ==========
-async function fetchSensor(channelKey, field, elementId) {
-  const url = `https://api.thingspeak.com/channels/${channelKey}/fields/${field}/last.json`;
+async function fetchSensor(channelId, field, elementId, apiKey) {
+  const url = `https://api.thingspeak.com/channels/${channelId}/fields/${field}/last.json?api_key=${apiKey}`;
   try {
     const response = await fetch(url);
     const data = await response.json();
@@ -14,42 +16,42 @@ async function fetchSensor(channelKey, field, elementId) {
 }
 
 function loadRoomData() {
-  fetchSensor(CHANNEL_1, 1, "master-temp");
-  fetchSensor(CHANNEL_1, 2, "master-presence");
-  fetchSensor(CHANNEL_2, 5, "master-light");
-  fetchSensor(CHANNEL_2, 6, "master-maint");
+  fetchSensor(CHANNEL_ID_1, 1, "master-temp", API_KEY_1);
+  fetchSensor(CHANNEL_ID_1, 2, "master-presence", API_KEY_1);
+  fetchSensor(CHANNEL_ID_2, 5, "master-light", API_KEY_2);
+  fetchSensor(CHANNEL_ID_2, 6, "master-maint", API_KEY_2);
 
-  fetchSensor(CHANNEL_1, 3, "kids-temp");
-  fetchSensor(CHANNEL_1, 4, "kids-presence");
-  fetchSensor(CHANNEL_2, 5, "kids-light");
-  fetchSensor(CHANNEL_2, 6, "kids-maint");
+  fetchSensor(CHANNEL_ID_1, 3, "kids-temp", API_KEY_1);
+  fetchSensor(CHANNEL_ID_1, 4, "kids-presence", API_KEY_1);
+  fetchSensor(CHANNEL_ID_2, 5, "kids-light", API_KEY_2);
+  fetchSensor(CHANNEL_ID_2, 6, "kids-maint", API_KEY_2);
 
-  fetchSensor(CHANNEL_1, 5, "guest-temp");
-  fetchSensor(CHANNEL_1, 6, "guest-presence");
-  fetchSensor(CHANNEL_2, 5, "guest-light");
-  fetchSensor(CHANNEL_2, 6, "guest-maint");
+  fetchSensor(CHANNEL_ID_1, 5, "guest-temp", API_KEY_1);
+  fetchSensor(CHANNEL_ID_1, 6, "guest-presence", API_KEY_1);
+  fetchSensor(CHANNEL_ID_2, 5, "guest-light", API_KEY_2);
+  fetchSensor(CHANNEL_ID_2, 6, "guest-maint", API_KEY_2);
 
-  fetchSensor(CHANNEL_2, 1, "living-temp");
-  fetchSensor(CHANNEL_2, 5, "living-light");
-  fetchSensor(CHANNEL_2, 6, "living-maint");
+  fetchSensor(CHANNEL_ID_2, 1, "living-temp", API_KEY_2);
+  fetchSensor(CHANNEL_ID_2, 5, "living-light", API_KEY_2);
+  fetchSensor(CHANNEL_ID_2, 6, "living-maint", API_KEY_2);
 
-  fetchSensor(CHANNEL_2, 2, "kitchen-smoke");
-  fetchSensor(CHANNEL_2, 5, "kitchen-light");
-  fetchSensor(CHANNEL_2, 6, "kitchen-maint");
+  fetchSensor(CHANNEL_ID_2, 2, "kitchen-smoke", API_KEY_2);
+  fetchSensor(CHANNEL_ID_2, 5, "kitchen-light", API_KEY_2);
+  fetchSensor(CHANNEL_ID_2, 6, "kitchen-maint", API_KEY_2);
 }
 
-// ========== DASHBOARD DATA ==========
+// ========== DASHBOARD ==========
 const dashboardFields = [
-  { label: "Master Temp", channel: CHANNEL_1, field: 1 },
-  { label: "Master Smoke", channel: CHANNEL_2, field: 2 },
-  { label: "Kids Temp", channel: CHANNEL_1, field: 3 },
-  { label: "Guest Temp", channel: CHANNEL_1, field: 5 },
-  { label: "Living Temp", channel: CHANNEL_2, field: 1 },
-  { label: "Kitchen Smoke", channel: CHANNEL_2, field: 2 }
+  { label: "Master Temp", channel: CHANNEL_ID_1, field: 1, apiKey: API_KEY_1 },
+  { label: "Master Smoke", channel: CHANNEL_ID_2, field: 2, apiKey: API_KEY_2 },
+  { label: "Kids Temp", channel: CHANNEL_ID_1, field: 3, apiKey: API_KEY_1 },
+  { label: "Guest Temp", channel: CHANNEL_ID_1, field: 5, apiKey: API_KEY_1 },
+  { label: "Living Temp", channel: CHANNEL_ID_2, field: 1, apiKey: API_KEY_2 },
+  { label: "Kitchen Smoke", channel: CHANNEL_ID_2, field: 2, apiKey: API_KEY_2 }
 ];
 
-async function fetchFieldData(channel, field) {
-  const url = `https://api.thingspeak.com/channels/${channel}/fields/${field}/last.json`;
+async function fetchFieldData(channelId, field, apiKey) {
+  const url = `https://api.thingspeak.com/channels/${channelId}/fields/${field}/last.json?api_key=${apiKey}`;
   try {
     const res = await fetch(url);
     const data = await res.json();
@@ -73,7 +75,7 @@ async function loadDashboardData() {
   const smokeValues = [];
 
   for (const item of dashboardFields) {
-    const result = await fetchFieldData(item.channel, item.field);
+    const result = await fetchFieldData(item.channel, item.field, item.apiKey);
     const listItem = document.createElement("li");
     listItem.textContent = `${item.label}: ${result.value} (at ${new Date(result.date).toLocaleString()})`;
     dataList.appendChild(listItem);
@@ -134,9 +136,9 @@ function downloadPDF() {
   pdf.save("smart-home-dashboard.pdf");
 }
 
-// ========== LDR PAGE ==========
+// ========== LDR ==========
 async function fetchLDR(field, elementId) {
-  const url = `https://api.thingspeak.com/channels/${CHANNEL_2}/fields/${field}/last.json`;
+  const url = `https://api.thingspeak.com/channels/${CHANNEL_ID_2}/fields/${field}/last.json?api_key=${API_KEY_2}`;
   try {
     const response = await fetch(url);
     const data = await response.json();
@@ -146,7 +148,7 @@ async function fetchLDR(field, elementId) {
   }
 }
 
-// ========== PAGE LOADING ==========
+// ========== LOAD ==========
 document.addEventListener("DOMContentLoaded", () => {
   const path = window.location.pathname;
 

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Master Room</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <ul>
+      <li><a href="index.html">🏠 Rooms</a></li>
+      <li><a href="ldr.html">💡 LDR Sensor</a></li>
+      <li><a href="dashboard.html">📊 Dashboard</a></li>
+    </ul>
+  </nav>
+
+  <main class="room-container">
+    <div class="room-card">
+      <h2>Master Room</h2>
+      
+      <p>Temperature: <span id="master-temp">Loading...</span> °C</p>
+      <p>Presence: <span id="master-presence">Loading...</span></p>
+      <p>Light Level: <span id="master-light">Loading...</span> lux</p>
+      <p>Maintenance: <span id="master-maint">Loading...</span></p>
+
+      <button onclick="loadRoomData()" class="refresh-btn">🔄 Refresh</button>
+      <a href="index.html" class="back-btn">🔙 Back to Home</a>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

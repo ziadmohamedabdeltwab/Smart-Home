@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <ul>
+      <li><a href="index.html">🏠 Rooms</a></li>
+      <li><a href="ldr.html">💡 LDR Sensor</a></li>
+      <li><a href="dashboard.html">📊 Dashboard</a></li>
+    </ul>
+  </nav>
+
+  <main class="room-container">
+    <div class="room-card">
+      <h2>📊 Smart Home Dashboard</h2>
+      <!-- <p>This dashboard displays recent temperature and smoke data fetched from ThingSpeak with timestamps.</p> -->
+      <button class="refresh-btn" onclick="loadDashboardData()">🔄 Load Latest Data</button>
+      <button class="refresh-btn" onclick="downloadPDF()">📄 Download as PDF</button>
+      <a class="refresh-btn" href="mailto:?subject=Smart Home Dashboard Report&body=Please find attached the smart home data report.">📧 Share via Email</a>
+
+      <div id="dashboard-info" class="dashboard-info">
+        <p><strong>Latest Sensor Data:</strong></p>
+        <ul id="data-list"></ul>
+      </div>
+
+      <canvas id="chart" width="320" height="200"></canvas>
+    </div>
+
+    <div class="back-box">
+      <a href="index.html" class="back-btn">🔙 Back to Home</a>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

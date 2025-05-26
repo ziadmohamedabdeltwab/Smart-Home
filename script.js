@@ -43,7 +43,7 @@ function loadRoomData() {
 // ========== DASHBOARD ==========
 const dashboardFields = [
   { label: "Master Temp", channel: CHANNEL_ID_1, field: 1, apiKey: API_KEY_1 },
-  { label: "Master Smoke", channel: CHANNEL_ID_2, field: 2, apiKey: API_KEY_2 },
+  { label: "Master prenses", channel: CHANNEL_ID_1, field: 2, apiKey: API_KEY_1 },
   { label: "Kids Temp", channel: CHANNEL_ID_1, field: 3, apiKey: API_KEY_1 },
   { label: "Guest Temp", channel: CHANNEL_ID_1, field: 5, apiKey: API_KEY_1 },
   { label: "Living Temp", channel: CHANNEL_ID_2, field: 1, apiKey: API_KEY_2 },

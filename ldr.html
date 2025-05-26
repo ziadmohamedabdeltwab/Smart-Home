@@ -27,26 +27,7 @@
     <a href="index.html" class="back-btn">🔙 Back to Home</a>
   </main>
 
-  <script>
-    const CHANNEL_2 = "OW98YIINEITU8MO1";
-
-    async function fetchLDR(field, elementId) {
-      const url = `https://api.thingspeak.com/channels/${CHANNEL_2}/fields/${field}/last.json`;
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        document.getElementById(elementId).textContent = data.field1 || "--";
-      } catch (err) {
-        document.getElementById(elementId).textContent = "Error";
-      }
-    }
-
-    fetchLDR(3, "ldr1");
-    fetchLDR(4, "ldr2");
-    setInterval(() => {
-      fetchLDR(3, "ldr1");
-      fetchLDR(4, "ldr2");
-    }, 15000);
-  </script>
+  <!-- ربط ملف الجافاسكربت -->
+  <script src="script.js"></script>
 </body>
 </html>

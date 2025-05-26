@@ -7,7 +7,7 @@ async function fetchSensor(channelKey, field, elementId) {
   try {
     const response = await fetch(url);
     const data = await response.json();
-    document.getElementById(elementId).textContent = data.field1 || "--";
+    document.getElementById(elementId).textContent = data[`field${field}`] || "--";
   } catch (err) {
     document.getElementById(elementId).textContent = "Error";
   }
@@ -37,13 +37,6 @@ function loadRoomData() {
   fetchSensor(CHANNEL_2, 5, "kitchen-light");
   fetchSensor(CHANNEL_2, 6, "kitchen-maint");
 }
-
-window.addEventListener("DOMContentLoaded", () => {
-  if (document.getElementById("master-temp")) {
-    loadRoomData();
-    setInterval(loadRoomData, 15000);
-  }
-});
 
 // ========== DASHBOARD DATA ==========
 const dashboardFields = [
@@ -140,3 +133,39 @@ function downloadPDF() {
 
   pdf.save("smart-home-dashboard.pdf");
 }
+
+// ========== LDR PAGE ==========
+async function fetchLDR(field, elementId) {
+  const url = `https://api.thingspeak.com/channels/${CHANNEL_2}/fields/${field}/last.json`;
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    document.getElementById(elementId).textContent = data[`field${field}`] || "--";
+  } catch (err) {
+    document.getElementById(elementId).textContent = "Error";
+  }
+}
+
+// ========== PAGE LOADING ==========
+document.addEventListener("DOMContentLoaded", () => {
+  const path = window.location.pathname;
+
+  if (document.getElementById("master-temp")) {
+    loadRoomData();
+    setInterval(loadRoomData, 15000);
+  }
+
+  if (path.includes("dashboard.html")) {
+    loadDashboardData();
+    setInterval(loadDashboardData, 15000);
+  }
+
+  if (path.includes("ldr.html")) {
+    fetchLDR(3, "ldr1");
+    fetchLDR(4, "ldr2");
+    setInterval(() => {
+      fetchLDR(3, "ldr1");
+      fetchLDR(4, "ldr2");
+    }, 15000);
+  }
+});

@@ -2,32 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LDR Sensor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LDR Sensors</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <nav class="navbar">
-    <ul>
-      <li><a href="index.html">🏠 Rooms</a></li>
-      <li><a href="ldr.html">💡 LDR Sensor</a></li>
-      <li><a href="dashboard.html">📊 Dashboard</a></li>
-    </ul>
-  </nav>
+  <div class="container">
+    <h1>LDR Sensor Readings</h1>
 
-  <main class="room-container">
-    <div class="room-card">
+    <div class="card">
       <h2>LDR Sensor 1</h2>
-      <p>Value: <span id="ldr1">Loading...</span> lux</p>
+      <p>Value: <span id="ldr1">--</span> lux</p>
     </div>
-    <div class="room-card">
-      <h2>LDR Sensor 2</h2>
-      <p>Value: <span id="ldr2">Loading...</span> lux</p>
-    </div>
-    <a href="index.html" class="back-btn">🔙 Back to Home</a>
-  </main>
 
-  <!-- ربط ملف الجافاسكربت -->
+    <div class="card">
+      <h2>LDR Sensor 2</h2>
+      <p>Value: <span id="ldr2">--</span> lux</p>
+    </div>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>

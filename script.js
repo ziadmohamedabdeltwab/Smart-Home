@@ -1,5 +1,5 @@
 const CHANNEL_ID_1 = 2972346; // الرقم الصحيح للقناة
-const CHANNEL_ID_2 = 2972346; // نفس القناة لـ LDR
+const CHANNEL_ID_2 = 2972349; // نفس القناة لـ LDR
 const API_KEY_1 = "PN4LQP0M8HOKCYVH";
 const API_KEY_2 = "OW98YIINEITU8MO1";
 

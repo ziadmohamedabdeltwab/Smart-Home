@@ -152,7 +152,7 @@ async function fetchLDR(field, elementId) {
 document.addEventListener("DOMContentLoaded", () => {
   const path = window.location.pathname;
 
-  if (document.getElementById("master-temp")) {
+  if (document.querySelector("[id$='-temp'], [id$='-presence'], [id$='-light'], [id$='-maint'], [id$='-smoke']")) {
     loadRoomData();
     setInterval(loadRoomData, 15000);
   }

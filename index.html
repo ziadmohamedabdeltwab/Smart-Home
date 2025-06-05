@@ -6,7 +6,6 @@
   <title>Smart Home - Rooms</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* الزر و ls فوق اليمين */
     .top-toggle {
       position: fixed;
       top: 15px;
@@ -59,7 +58,6 @@
     input:checked + .slider:before {
       transform: translateX(26px);
     }
-    /* اسفل الصفحة */
     .footer {
       text-align: center;
       font-weight: bold;
@@ -115,7 +113,7 @@
   <div class="top-toggle">
     <span class="label">ls</span>
     <label class="switch">
-      <input type="checkbox" id="powerToggle" onchange="togglePower()" />
+      <input type="checkbox" id="powerToggle" />
       <span class="slider"></span>
     </label>
   </div>
@@ -124,15 +122,36 @@
   <div class="footer">يا عم</div>
 
   <script>
-    function togglePower() {
-      const checkbox = document.getElementById("powerToggle");
-      const value = checkbox.checked ? 1 : 0;
-      const apiKey = "7DG1V6WCECJTMTVI";
-      const url = `https://api.thingspeak.com/update?api_key=${apiKey}&field1=${value}`;
+    const writeApiKey = "7DG1V6WCECJTMTVI";
+    const readApiKey = "GGETT0LPSCQRBY8M";
+    const channelId = "2972350";
 
-      console.log("Sending to ThingSpeak:", value);
+    const checkbox = document.getElementById("powerToggle");
 
+    // جلب آخر قيمة من ThingSpeak وعكس حالة الزر
+    function fetchCurrentState() {
+      const url = `https://api.thingspeak.com/channels/${channelId}/fields/1/last.json?api_key=${readApiKey}`;
       fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          const fieldValue = data.field1;
+          console.log("Current ThingSpeak value:", fieldValue);
+          checkbox.checked = fieldValue === "1";
+        })
+        .catch(error => {
+          console.error("Error fetching ThingSpeak data:", error);
+          // لو فيه مشكلة خلي الزر افتراضي مطفي
+          checkbox.checked = false;
+        });
+    }
+
+    // إرسال القيمة عند التغيير
+    function togglePower() {
+      const value = checkbox.checked ? 1 : 0;
+      const url = `https://api.thingspeak.com/update?api_key=${writeApiKey}&field1=${value}`;
+      console.log("Sending to ThingSpeak:", value, url);
+
+      fetch(url, { cache: "no-cache" })
         .then(response => {
           if (response.ok) {
             console.log(`ThingSpeak updated with value: ${value}`);
@@ -145,6 +164,12 @@
           alert("حصل خطأ أثناء الإرسال");
         });
     }
+
+    // ربط الزر بالدالة عند تغييره
+    checkbox.addEventListener("change", togglePower);
+
+    // عند تحميل الصفحة نجيب الحالة من ThingSpeak
+    window.addEventListener("load", fetchCurrentState);
   </script>
 
 </body>

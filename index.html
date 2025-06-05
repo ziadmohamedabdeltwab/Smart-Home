@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Smart Home - Rooms</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>ThingSpeak Toggle Button</title>
   <style>
-    /* زر التبديل أسفل اليمين */
-    .bottom-toggle {
+    .top-toggle {
       position: fixed;
       bottom: 10px;
       right: 10px;
@@ -59,112 +57,77 @@
 </head>
 <body>
 
-  <!-- القائمة -->
-  <nav class="navbar">
-    <ul>
-      <li><a href="index.html">🏠 Rooms</a></li>
-      <li><a href="ldr.html">💡 LDR Sensor</a></li>
-      <li><a href="dashboard.html">📊 Dashboard</a></li>
-    </ul>
-  </nav>
-
-  <!-- كروت الغرف -->
-  <main class="room-container">
-
-    <div class="room-card">
-      <div class="room-label">🏠 Master Room</div>
-      <a href="master.html" class="room-btn">Enter</a>
-    </div>
-
-    <div class="room-card">
-      <div class="room-label">🧸 Kids Room</div>
-      <a href="kids.html" class="room-btn">Enter</a>
-    </div>
-
-    <div class="room-card">
-      <div class="room-label">👤 Guest Room</div>
-      <a href="guest.html" class="room-btn">Enter</a>
-    </div>
-
-    <div class="room-card">
-      <div class="room-label">🛋 Living Room</div>
-      <a href="living.html" class="room-btn">Enter</a>
-    </div>
-
-    <div class="room-card">
-      <div class="room-label">🍳 Kitchen Room</div>
-      <a href="kitchen.html" class="room-btn">Enter</a>
-    </div>
-
-  </main>
-
-  <!-- زر التبديل manual -->
-  <div class="bottom-toggle" title="Toggle power">
-    <span>manual</span>
-    <label class="switch">
-      <input type="checkbox" id="powerToggle" />
-      <span class="slider"></span>
-    </label>
-  </div>
-
-  <!-- أسامي الفريق -->
-  <div class="footer">
-    Made by: Adham Elsayed, Mohaned Hany, Mariam Mina, Mohamed Ahmed, Omar Soliman,<br>
-    Eslam Owis, Abdellah Moftah, Mohamed Abdelaal
-  </div>
+<!-- زر التبديل مع كلمة manual -->
+<div class="top-toggle" title="Toggle power">
+  <span>manual</span>
+  <label class="switch">
+    <input type="checkbox" id="powerToggle" />
+    <span class="slider"></span>
+  </label>
+</div>
 
 <script>
   const apiKey = "7DG1V6WCECJTMTVI";
   const channelId = 2972350;
   const powerToggle = document.getElementById("powerToggle");
-
   let isSending = false;
+  let currentValue = null; // حالة الزر الحالية حسب ThingSpeak
 
-  // تحميل الحالة الحالية من ThingSpeak
+  // جلب الحالة الحالية من ThingSpeak وتعيين الزر عليها
   async function fetchCurrentState() {
     try {
       const url = `https://api.thingspeak.com/channels/${channelId}/fields/1/last.json?cachebuster=${Date.now()}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to fetch state");
       const data = await res.json();
-      powerToggle.checked = data.field1 == "1";
+      currentValue = data.field1 === "1" ? 1 : 0;
+      powerToggle.checked = currentValue === 1;
     } catch (error) {
       console.error("Error fetching current state:", error);
     }
   }
 
-  // عند تبديل الزر، إرسال الحالة الجديدة لـ ThingSpeak
+  // عند تغيير الزر، نبعت الحالة الجديدة بس لو مختلف عن الحالية
   powerToggle.addEventListener("change", async () => {
     if (isSending) {
-      // لو طلب شغال، ارجع الزر لحالته السابقة
-      powerToggle.checked = !powerToggle.checked;
+      powerToggle.checked = currentValue === 1;
       return;
     }
-    isSending = true;
-    powerToggle.disabled = true;  // تعطيل الزر لمنع تكرار الإرسال
+    const newVal = powerToggle.checked ? 1 : 0;
 
-    const val = powerToggle.checked ? 1 : 0;
-    const updateUrl = `https://api.thingspeak.com/update?api_key=${apiKey}&field1=${val}`;
+    // لو القيمة ما تغيرتش، ما نبعتش
+    if (newVal === currentValue) {
+      console.log("Value unchanged, no update sent");
+      return;
+    }
+
+    isSending = true;
+    powerToggle.disabled = true;
+
+    const updateUrl = `https://api.thingspeak.com/update?api_key=${apiKey}&field1=${newVal}`;
 
     try {
-      const response = await fetch(updateUrl);
-      if (!response.ok) {
-        alert("Failed to update ThingSpeak");
-        powerToggle.checked = !powerToggle.checked;
-      } else {
-        console.log("ThingSpeak updated with value:", val);
-      }
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+      const response = await fetch(updateUrl, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) throw new Error("Failed to update ThingSpeak");
+
+      currentValue = newVal; // حدث القيمة الحالية
+      console.log("ThingSpeak updated with value:", newVal);
+
     } catch (error) {
-      alert("Error sending data to ThingSpeak");
-      powerToggle.checked = !powerToggle.checked;
+      alert("Error sending data or timeout");
+      powerToggle.checked = currentValue === 1; // رجع الحالة القديمة
       console.error(error);
     } finally {
       isSending = false;
-      powerToggle.disabled = false;  // إعادة تفعيل الزر
+      powerToggle.disabled = false;
     }
   });
 
-  // تحميل الحالة عند بدء تحميل الصفحة
   fetchCurrentState();
 </script>
 

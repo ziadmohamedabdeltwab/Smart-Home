@@ -6,7 +6,7 @@
   <title>Smart Home - Rooms</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* زر التبديل تحت الصفحة */
+    /* زر التبديل أسفل اليمين */
     .bottom-toggle {
       position: fixed;
       bottom: 10px;
@@ -98,13 +98,7 @@
 
   </main>
 
-  <!-- أسامي الفريق -->
-  <div class="footer">
-    Made by: Adham Elsayed, Mohaned Hany, Mariam Mina, Mohamed Ahmed, Omar Soliman,<br>
-    Eslam Owis, Abdellah Moftah, Mohamed Abdelaal
-  </div>
-
-  <!-- زر التبديل تحت -->
+  <!-- زر التبديل manual -->
   <div class="bottom-toggle" title="Toggle power">
     <span>manual</span>
     <label class="switch">
@@ -113,54 +107,66 @@
     </label>
   </div>
 
-  <script>
-    const apiKey = "7DG1V6WCECJTMTVI";
-    const channelId = 2972350;
-    const powerToggle = document.getElementById("powerToggle");
+  <!-- أسامي الفريق -->
+  <div class="footer">
+    Made by: Adham Elsayed, Mohaned Hany, Mariam Mina, Mohamed Ahmed, Omar Soliman,<br>
+    Eslam Owis, Abdellah Moftah, Mohamed Abdelaal
+  </div>
 
-    let isSending = false;
+<script>
+  const apiKey = "7DG1V6WCECJTMTVI";
+  const channelId = 2972350;
+  const powerToggle = document.getElementById("powerToggle");
 
-    async function fetchCurrentState() {
-      try {
-        const url = `https://api.thingspeak.com/channels/${channelId}/fields/1/last.json?cachebuster=${Date.now()}`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error("Failed to fetch state");
-        const data = await res.json();
-        const currentValue = data.field1;
-        powerToggle.checked = currentValue == "1";
-      } catch (error) {
-        console.error("Error fetching current state:", error);
-      }
+  let isSending = false;
+
+  // تحميل الحالة الحالية من ThingSpeak
+  async function fetchCurrentState() {
+    try {
+      const url = `https://api.thingspeak.com/channels/${channelId}/fields/1/last.json?cachebuster=${Date.now()}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Failed to fetch state");
+      const data = await res.json();
+      powerToggle.checked = data.field1 == "1";
+    } catch (error) {
+      console.error("Error fetching current state:", error);
     }
+  }
 
-    powerToggle.addEventListener("change", async () => {
-      if (isSending) {
+  // عند تبديل الزر، إرسال الحالة الجديدة لـ ThingSpeak
+  powerToggle.addEventListener("change", async () => {
+    if (isSending) {
+      // لو طلب شغال، ارجع الزر لحالته السابقة
+      powerToggle.checked = !powerToggle.checked;
+      return;
+    }
+    isSending = true;
+    powerToggle.disabled = true;  // تعطيل الزر لمنع تكرار الإرسال
+
+    const val = powerToggle.checked ? 1 : 0;
+    const updateUrl = `https://api.thingspeak.com/update?api_key=${apiKey}&field1=${val}`;
+
+    try {
+      const response = await fetch(updateUrl);
+      if (!response.ok) {
+        alert("Failed to update ThingSpeak");
         powerToggle.checked = !powerToggle.checked;
-        return;
+      } else {
+        console.log("ThingSpeak updated with value:", val);
       }
-      isSending = true;
-      const val = powerToggle.checked ? 1 : 0;
-      const updateUrl = `https://api.thingspeak.com/update?api_key=${apiKey}&field1=${val}`;
+    } catch (error) {
+      alert("Error sending data to ThingSpeak");
+      powerToggle.checked = !powerToggle.checked;
+      console.error(error);
+    } finally {
+      isSending = false;
+      powerToggle.disabled = false;  // إعادة تفعيل الزر
+    }
+  });
 
-      try {
-        const response = await fetch(updateUrl);
-        if (!response.ok) {
-          alert("Failed to update ThingSpeak");
-          powerToggle.checked = !powerToggle.checked;
-        } else {
-          console.log("ThingSpeak updated with value:", val);
-        }
-      } catch (error) {
-        alert("Error sending data to ThingSpeak");
-        powerToggle.checked = !powerToggle.checked;
-        console.error(error);
-      } finally {
-        isSending = false;
-      }
-    });
-
-    fetchCurrentState();
-  </script>
+  // تحميل الحالة عند بدء تحميل الصفحة
+  fetchCurrentState();
+</script>
 
 </body>
 </html>

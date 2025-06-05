@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Smart Home - Rooms</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* إضافة أسلوب الزر التبديل (switch) */
+    /* الزر و ls فوق اليمين */
     .top-toggle {
       position: fixed;
       top: 15px;
@@ -17,6 +17,10 @@
       font-weight: bold;
       font-family: Arial, sans-serif;
       z-index: 1000;
+      background: #f0f0f0;
+      padding: 5px 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.1);
     }
     .switch {
       position: relative;
@@ -32,10 +36,7 @@
     .slider {
       position: absolute;
       cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       background-color: #ccc;
       transition: 0.4s;
       border-radius: 24px;
@@ -57,6 +58,14 @@
     }
     input:checked + .slider:before {
       transform: translateX(26px);
+    }
+    /* اسفل الصفحة */
+    .footer {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 40px;
+      font-family: Arial, sans-serif;
+      color: #333;
     }
   </style>
 </head>
@@ -102,7 +111,7 @@
 
   </main>
 
-  <!-- زر ls ثابت في أعلى اليمين -->
+  <!-- زر ls فوق اليمين -->
   <div class="top-toggle">
     <span class="label">ls</span>
     <label class="switch">
@@ -111,11 +120,8 @@
     </label>
   </div>
 
-  <!-- أسامي الفريق -->
-  <div class="footer">
-    Made by: Adham Elsayed, Mohaned Hany, Mariam Mina, Mohamed Ahmed, Omar Soliman,<br>
-    Eslam Owis, Abdellah Moftah, Mohamed Abdelaal
-  </div>
+  <!-- نص يا عم اسفل الصفحة -->
+  <div class="footer">يا عم</div>
 
   <script>
     function togglePower() {
@@ -124,17 +130,19 @@
       const apiKey = "7DG1V6WCECJTMTVI";
       const url = `https://api.thingspeak.com/update?api_key=${apiKey}&field1=${value}`;
 
+      console.log("Sending to ThingSpeak:", value);
+
       fetch(url)
         .then(response => {
           if (response.ok) {
             console.log(`ThingSpeak updated with value: ${value}`);
           } else {
-            alert("Failed to update ThingSpeak.");
+            alert("فشل إرسال البيانات لـ ThingSpeak");
           }
         })
         .catch(error => {
           console.error("Error sending to ThingSpeak:", error);
-          alert("Error occurred.");
+          alert("حصل خطأ أثناء الإرسال");
         });
     }
   </script>

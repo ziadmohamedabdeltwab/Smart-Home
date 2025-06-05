@@ -14,6 +14,12 @@
       gap: 8px;
       font-weight: bold;
       font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      padding: 6px 12px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      user-select: none;
+      z-index: 9999;
     }
     .switch {
       position: relative;
@@ -51,7 +57,7 @@
 </head>
 <body>
 
-<div class="top-toggle">
+<div class="top-toggle" title="Toggle power">
   <span>ls</span>
   <label class="switch">
     <input type="checkbox" id="powerToggle" />
@@ -61,19 +67,19 @@
 
 <script>
   const apiKey = "7DG1V6WCECJTMTVI";
+  const channelId = 2972350;
   const powerToggle = document.getElementById("powerToggle");
 
-  // عند تحميل الصفحة، نقرأ الحالة من ThingSpeak ونعمل تحديث للزر
+  // لمنع إرسال طلبات متكررة بسرعة
+  let isSending = false;
+
+  // تحميل حالة الزر من ThingSpeak
   async function fetchCurrentState() {
     try {
-      // ID القناة
-      const channelId = 2972350;
-      // رابط قراءة آخر قيمة في field1
-      const url = `https://api.thingspeak.com/channels/${channelId}/fields/1/last.json`;
+      const url = `https://api.thingspeak.com/channels/${channelId}/fields/1/last.json?cachebuster=${Date.now()}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to fetch state");
       const data = await res.json();
-      // القيمة ممكن تكون null أو undefined
       const currentValue = data.field1;
       powerToggle.checked = currentValue == "1";
     } catch (error) {
@@ -81,8 +87,15 @@
     }
   }
 
-  // لما المستخدم يغير الزر
+  // تحديث الحالة على ThingSpeak عند تبديل الزر
   powerToggle.addEventListener("change", async () => {
+    if (isSending) {
+      // لو فيه طلب شغال، نرجع الزر للحالة السابقة
+      powerToggle.checked = !powerToggle.checked;
+      return;
+    }
+    isSending = true;
+
     const val = powerToggle.checked ? 1 : 0;
     const updateUrl = `https://api.thingspeak.com/update?api_key=${apiKey}&field1=${val}`;
 
@@ -90,19 +103,20 @@
       const response = await fetch(updateUrl);
       if (!response.ok) {
         alert("Failed to update ThingSpeak");
-        // لو فشل التحديث، نرجع الزر للحالة القديمة
-        powerToggle.checked = !powerToggle.checked;
+        powerToggle.checked = !powerToggle.checked; // استرجاع الحالة القديمة
       } else {
         console.log("ThingSpeak updated with value:", val);
       }
     } catch (error) {
       alert("Error sending data to ThingSpeak");
-      powerToggle.checked = !powerToggle.checked;
+      powerToggle.checked = !powerToggle.checked; // استرجاع الحالة القديمة
       console.error(error);
+    } finally {
+      isSending = false;
     }
   });
 
-  // نبدأ بتحميل الحالة
+  // تحميل الحالة عند بداية فتح الصفحة
   fetchCurrentState();
 </script>
 

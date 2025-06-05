@@ -182,14 +182,20 @@ body {
   to { transform: translateY(0); opacity: 1; }
 }
 .toggle-container {
-  text-align: center;
-  margin: 50px 0 30px;
+.top-toggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  z-index: 1000;
 }
 
-.toggle-container h3 {
-  font-size: 20px;
+.top-toggle .label {
+  font-size: 18px;
+  margin-right: 10px;
   color: #1e1e2f;
-  margin-bottom: 15px;
+  font-weight: bold;
 }
 
 /* شكل الزر */

@@ -5,28 +5,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Smart Home - Rooms</title>
   <link rel="stylesheet" href="style.css" />
-</head>
-  <script>
-  function togglePower() {
-    const isChecked = document.getElementById("powerToggle").checked;
-    const value = isChecked ? 1 : 0;
-    const apiKey = "7DG1V6WCECJTMTVI";
-    const url = `https://api.thingspeak.com/update?api_key=${apiKey}&field1=${value}`;
+  <style>
+    /* لو CSS الزر مش موجود عندك، ضيف ده عشان الشكل والموقع */
+    .top-toggle {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #f0f0f0;
+      padding: 6px 12px;
+      border-radius: 20px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.15);
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+      z-index: 9999;
+    }
 
-    fetch(url)
-      .then(response => {
-        if (response.ok) {
-          console.log(`ThingSpeak updated with value: ${value}`);
-        } else {
-          alert("Failed to update ThingSpeak.");
-        }
-      })
-      .catch(error => {
-        console.error("Error sending to ThingSpeak:", error);
-        alert("Error occurred.");
-      });
-  }
-</script>
+    .top-toggle .label {
+      font-size: 16px;
+      color: #333;
+    }
+
+    /* switch style */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 22px;
+    }
+
+    .switch input {display:none;}
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 22px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #4CAF50;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(18px);
+    }
+  </style>
+</head>
+
 
 <body>
 
@@ -38,6 +82,15 @@
       <li><a href="dashboard.html">📊 Dashboard</a></li>
     </ul>
   </nav>
+
+  <!-- الزر مع ls فوق على اليمين -->
+  <div class="top-toggle" onclick="document.getElementById('powerToggle').click()">
+    <span class="label">ls</span>
+    <label class="switch">
+      <input type="checkbox" id="powerToggle" onchange="togglePower()" />
+      <span class="slider"></span>
+    </label>
+  </div>
 
   <!-- كروت الغرف -->
   <main class="room-container">
@@ -67,14 +120,6 @@
       <a href="kitchen.html" class="room-btn">Enter</a>
     </div>
 
-<div class="top-toggle">
-  <span class="label">ls</span>
-  <label class="switch">
-    <input type="checkbox" id="powerToggle" onchange="togglePower()" />
-    <span class="slider"></span>
-  </label>
-</div>
-
   </main>
 
   <!-- أسامي الفريق -->
@@ -82,6 +127,28 @@
     Made by: Adham Elsayed, Mohaned Hany, Mariam Mina, Mohamed Ahmed, Omar Soliman,<br>
     Eslam Owis, Abdellah Moftah, Mohamed Abdelaal
   </div>
+
+  <script>
+    function togglePower() {
+      const isChecked = document.getElementById("powerToggle").checked;
+      const value = isChecked ? 1 : 0;
+      const apiKey = "7DG1V6WCECJTMTVI";
+      const url = `https://api.thingspeak.com/update?api_key=${apiKey}&field1=${value}`;
+
+      fetch(url)
+        .then(response => {
+          if (response.ok) {
+            console.log(`ThingSpeak updated with value: ${value}`);
+          } else {
+            alert("فشل في تحديث ThingSpeak.");
+          }
+        })
+        .catch(error => {
+          console.error("خطأ في الإرسال لـ ThingSpeak:", error);
+          alert("حدث خطأ أثناء الإرسال.");
+        });
+    }
+  </script>
 
 </body>
 </html>

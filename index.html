@@ -6,6 +6,28 @@
   <title>Smart Home - Rooms</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+  <script>
+  function togglePower() {
+    const isChecked = document.getElementById("powerToggle").checked;
+    const value = isChecked ? 1 : 0;
+    const apiKey = "7DG1V6WCECJTMTVI";
+    const url = `https://api.thingspeak.com/update?api_key=${apiKey}&field1=${value}`;
+
+    fetch(url)
+      .then(response => {
+        if (response.ok) {
+          console.log(`ThingSpeak updated with value: ${value}`);
+        } else {
+          alert("Failed to update ThingSpeak.");
+        }
+      })
+      .catch(error => {
+        console.error("Error sending to ThingSpeak:", error);
+        alert("Error occurred.");
+      });
+  }
+</script>
+
 <body>
 
   <!-- القائمة -->

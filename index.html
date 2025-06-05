@@ -3,23 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Smart Home - Rooms</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>ThingSpeak Toggle Button</title>
   <style>
     .top-toggle {
       position: fixed;
-      top: 15px;
-      right: 15px;
+      top: 10px;
+      right: 10px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       font-weight: bold;
       font-family: Arial, sans-serif;
-      z-index: 1000;
-      background: #f0f0f0;
-      padding: 5px 10px;
-      border-radius: 8px;
-      box-shadow: 0 0 6px rgba(0,0,0,0.1);
     }
     .switch {
       position: relative;
@@ -27,11 +21,7 @@
       width: 50px;
       height: 24px;
     }
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
+    .switch input { display:none; }
     .slider {
       position: absolute;
       cursor: pointer;
@@ -52,125 +42,69 @@
       border-radius: 50%;
     }
     input:checked + .slider {
-      background-color: #4caf50;
-      box-shadow: 0 0 5px #4caf50;
+      background-color: #2196F3;
     }
     input:checked + .slider:before {
       transform: translateX(26px);
     }
-    .footer {
-      text-align: center;
-      font-weight: bold;
-      margin-top: 40px;
-      font-family: Arial, sans-serif;
-      color: #333;
-    }
   </style>
 </head>
-
 <body>
 
-  <!-- القائمة -->
-  <nav class="navbar">
-    <ul>
-      <li><a href="index.html">🏠 Rooms</a></li>
-      <li><a href="ldr.html">💡 LDR Sensor</a></li>
-      <li><a href="dashboard.html">📊 Dashboard</a></li>
-    </ul>
-  </nav>
+<div class="top-toggle">
+  <span>ls</span>
+  <label class="switch">
+    <input type="checkbox" id="powerToggle" />
+    <span class="slider"></span>
+  </label>
+</div>
 
-  <!-- كروت الغرف -->
-  <main class="room-container">
+<script>
+  const apiKey = "7DG1V6WCECJTMTVI";
+  const powerToggle = document.getElementById("powerToggle");
 
-    <div class="room-card">
-      <div class="room-label">🏠 Master Room</div>
-      <a href="master.html" class="room-btn">Enter</a>
-    </div>
-
-    <div class="room-card">
-      <div class="room-label">🧸 Kids Room</div>
-      <a href="kids.html" class="room-btn">Enter</a>
-    </div>
-
-    <div class="room-card">
-      <div class="room-label">👤 Guest Room</div>
-      <a href="guest.html" class="room-btn">Enter</a>
-    </div>
-
-    <div class="room-card">
-      <div class="room-label">🛋 Living Room</div>
-      <a href="living.html" class="room-btn">Enter</a>
-    </div>
-
-    <div class="room-card">
-      <div class="room-label">🍳 Kitchen Room</div>
-      <a href="kitchen.html" class="room-btn">Enter</a>
-    </div>
-
-  </main>
-
-  <!-- زر ls فوق اليمين -->
-  <div class="top-toggle">
-    <span class="label">ls</span>
-    <label class="switch">
-      <input type="checkbox" id="powerToggle" />
-      <span class="slider"></span>
-    </label>
-  </div>
-
-  <!-- نص يا عم اسفل الصفحة -->
-  <div class="footer">يا عم</div>
-
-  <script>
-    const writeApiKey = "7DG1V6WCECJTMTVI";
-    const readApiKey = "GGETT0LPSCQRBY8M";
-    const channelId = "2972350";
-
-    const checkbox = document.getElementById("powerToggle");
-
-    // جلب آخر قيمة من ThingSpeak وعكس حالة الزر
-    function fetchCurrentState() {
-      const url = `https://api.thingspeak.com/channels/${channelId}/fields/1/last.json?api_key=${readApiKey}`;
-      fetch(url)
-        .then(response => response.json())
-        .then(data => {
-          const fieldValue = data.field1;
-          console.log("Current ThingSpeak value:", fieldValue);
-          checkbox.checked = fieldValue === "1";
-        })
-        .catch(error => {
-          console.error("Error fetching ThingSpeak data:", error);
-          // لو فيه مشكلة خلي الزر افتراضي مطفي
-          checkbox.checked = false;
-        });
+  // عند تحميل الصفحة، نقرأ الحالة من ThingSpeak ونعمل تحديث للزر
+  async function fetchCurrentState() {
+    try {
+      // ID القناة
+      const channelId = 2972350;
+      // رابط قراءة آخر قيمة في field1
+      const url = `https://api.thingspeak.com/channels/${channelId}/fields/1/last.json`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Failed to fetch state");
+      const data = await res.json();
+      // القيمة ممكن تكون null أو undefined
+      const currentValue = data.field1;
+      powerToggle.checked = currentValue == "1";
+    } catch (error) {
+      console.error("Error fetching current state:", error);
     }
+  }
 
-    // إرسال القيمة عند التغيير
-    function togglePower() {
-      const value = checkbox.checked ? 1 : 0;
-      const url = `https://api.thingspeak.com/update?api_key=${writeApiKey}&field1=${value}`;
-      console.log("Sending to ThingSpeak:", value, url);
+  // لما المستخدم يغير الزر
+  powerToggle.addEventListener("change", async () => {
+    const val = powerToggle.checked ? 1 : 0;
+    const updateUrl = `https://api.thingspeak.com/update?api_key=${apiKey}&field1=${val}`;
 
-      fetch(url, { cache: "no-cache" })
-        .then(response => {
-          if (response.ok) {
-            console.log(`ThingSpeak updated with value: ${value}`);
-          } else {
-            alert("فشل إرسال البيانات لـ ThingSpeak");
-          }
-        })
-        .catch(error => {
-          console.error("Error sending to ThingSpeak:", error);
-          alert("حصل خطأ أثناء الإرسال");
-        });
+    try {
+      const response = await fetch(updateUrl);
+      if (!response.ok) {
+        alert("Failed to update ThingSpeak");
+        // لو فشل التحديث، نرجع الزر للحالة القديمة
+        powerToggle.checked = !powerToggle.checked;
+      } else {
+        console.log("ThingSpeak updated with value:", val);
+      }
+    } catch (error) {
+      alert("Error sending data to ThingSpeak");
+      powerToggle.checked = !powerToggle.checked;
+      console.error(error);
     }
+  });
 
-    // ربط الزر بالدالة عند تغييره
-    checkbox.addEventListener("change", togglePower);
-
-    // عند تحميل الصفحة نجيب الحالة من ThingSpeak
-    window.addEventListener("load", fetchCurrentState);
-  </script>
+  // نبدأ بتحميل الحالة
+  fetchCurrentState();
+</script>
 
 </body>
 </html>
